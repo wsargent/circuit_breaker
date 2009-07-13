@@ -1,0 +1,8 @@
+.autotest
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/circuit_breaker
+lib/circuit_breaker.rb
+test/test_circuit_breaker.rb
