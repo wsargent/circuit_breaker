@@ -1,4 +1,3 @@
-require 'aasm'
 require 'logger'
 
 #

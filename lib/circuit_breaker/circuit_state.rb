@@ -1,3 +1,4 @@
+require 'aasm'
 
 #
 # CircuitState is created individually for each object, and keeps
