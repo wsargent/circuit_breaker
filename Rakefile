@@ -6,7 +6,7 @@ require 'hoe'
 require 'circuit_breaker'
 
 hoe = Hoe.spec 'circuit_breaker' do |p|
-  self.rubyforge_name = 'will_sargent'
+  self.rubyforge_name = 'circuit-breaker'
   developer('Will Sargent', 'will.sargent@gmail.com')
   
   p.remote_rdoc_dir = '' # Release to root only one project
@@ -24,3 +24,4 @@ begin
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
+
