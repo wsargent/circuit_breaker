@@ -1,5 +1,3 @@
-require 'logger'
-
 #
 #
 # CircuitHandler is stateless,
@@ -7,7 +5,6 @@ require 'logger'
 #
 #
 class CircuitBreaker::CircuitHandler
-
 
   #
   # The number of failures needed to trip the breaker.

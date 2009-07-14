@@ -1,26 +1,68 @@
 = circuit_breaker
 
 * http://github.com/wsargent/circuit_breaker
+  Will Sargent <will.sargent@gmail.com>
+  Copyright 2009 Will Sargent
 
 == DESCRIPTION:
 
-FIX (describe your package)
+ CircuitBreaker is a relatively simple Ruby mixin that will wrap
+ a call to a given service in a circuit breaker pattern.
+
+ The circuit starts off "closed" meaning that all calls will go through.
+ However, consecutive failures are recorded and after a threshold is reached,
+ the circuit will "trip", setting the circuit into an "open" state.
+
+ In an "open" state, every call to the service will fail by raising
+ CircuitBrokenException.
+
+ The circuit will remain in an "open" state until the failure timeout has
+ elapsed.
+
+ After the failure_timeout has elapsed, the circuit will go into
+ a "half open" state and the call will go through.  A failure will
+ immediately pop the circuit open again, and a success will close the
+ circuit and reset the failure count.
+
+ require 'circuit_breaker'
+ class TestService
+
+   include CircuitBreaker
+
+   def call_remote_service() ...
+
+   circuit_method :call_remote_service
+
+   # Optional
+   circuit_handler do |handler|
+     handler.logger = Logger.new(STDOUT)
+     handler.failure_threshold = 5
+     handler.failure_timeout = 5
+   end
+
+   # Optional
+   circuit_handler_class MyCustomCircuitHandler
+ end
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* Can run out of the box with minimal dependencies and a couple of lines of code.
+* Easy to extend: add your own circuit breakers or states or extend the existing ones.
+* Does not currently handle static class methods.
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+  An implementation of Michael Nygard's Circuit Breaker pattern.
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+  circuit_breaker has a dependency on AASM (http://github.com/rubyist/aasm/tree/master).
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* gem sources -a http://gems.github.com
+* gem install rubyist-aasm
+* gem install wsargent_circuit-breaker
 
 == LICENSE:
 

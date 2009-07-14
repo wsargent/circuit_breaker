@@ -1,15 +1,26 @@
 # -*- ruby -*-
+$:.unshift(File.dirname(__FILE__) + "/lib")
 
 require 'rubygems'
 require 'hoe'
+require 'circuit_breaker'
 
-$:.unshift(File.dirname(__FILE__) + "/lib")
-
-Hoe.spec 'circuit_breaker' do
+hoe = Hoe.spec 'circuit_breaker' do |p|
+  self.rubyforge_name = 'will_sargent'
   developer('Will Sargent', 'will.sargent@gmail.com')
+  
+  p.remote_rdoc_dir = '' # Release to root only one project
 
-  extra_deps = [ 'rubyist-aasm' ]
-  extra_dev_deps = [ 'rspec' ]
+  p.extra_deps << [ 'rubyist-aasm' ]
+  p.extra_dev_deps << [ 'rspec' ]
+  File.open(File.join(File.dirname(__FILE__), 'VERSION'), 'w') do |file|
+    file.puts CircuitBreaker::VERSION
+  end
 end
 
-# vim: syntax=ruby
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new(hoe.spec)
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+end

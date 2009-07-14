@@ -1,8 +1,11 @@
-.autotest
 History.txt
 Manifest.txt
 README.txt
 Rakefile
-bin/circuit_breaker
+circuit_breaker.gemspec
 lib/circuit_breaker.rb
-test/test_circuit_breaker.rb
+lib/circuit_breaker/circuit_state.rb
+lib/circuit_breaker/circuit_handler.rb
+lib/circuit_breaker/circuit_broken_exception.rb
+spec/unit_spec_helper.rb
+spec/unit/circuit_breaker_spec.rb

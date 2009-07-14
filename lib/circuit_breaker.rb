@@ -1,4 +1,3 @@
-
 #
 # CircuitBreaker is a relatively simple Ruby mixin that will wrap
 # a call to a given service in a circuit breaker pattern.
@@ -14,7 +13,7 @@
 # elapsed.
 #
 # After the failure_timeout has elapsed, the circuit will go into
-# a "half open" state and the call will go through.  A failure will 
+# a "half open" state and the call will go through.  A failure will
 # immediately pop the circuit open again, and a success will close the
 # circuit and reset the failure count.
 #
@@ -27,14 +26,19 @@
 #
 #   circuit_method :call_remote_service
 #
+#   # Optional
 #   circuit_handler do |handler|
 #     handler.logger = Logger.new(STDOUT)
 #     handler.failure_threshold = 5
 #     handler.failure_timeout = 5
 #   end
-# end
-
 #
+#   # Optional
+#   circuit_handler_class MyCustomCircuitHandler
+#
+# end
+#
+# Copyright 2009 Will Sargent
 # Author: Will Sargent <will.sargent@gmail.com>
 # Many thanks to Devin Mullins
 #
@@ -48,27 +52,46 @@ module CircuitBreaker
     klass.extend ::CircuitBreaker::ClassMethods
   end
 
+  #
+  # Returns the current circuit state.  This is defined on the instance, so
+  # you can have several instances of the same class with different states.
+  #
   def circuit_state
     @circuit_state ||= self.class.circuit_handler.new_circuit_state
   end
 
   module ClassMethods
-  
-    def circuit_method(meth)
+
+    #
+    # Takes a splat of method names, and wraps them with the circuit_handler.
+    #
+    def circuit_method(*methods)
       circuit_handler = self.circuit_handler
 
-      m = instance_method meth
-      define_method meth do |*args|
-        circuit_handler.handle self.circuit_state, m.bind(self), *args
+      methods.each do |meth|
+        m = instance_method meth
+        define_method meth do |*args|
+          circuit_handler.handle self.circuit_state, m.bind(self), *args
+        end
       end
     end
 
+    #
+    # Returns circuit_handler.  Yields the instance back when passed a block.
+    #
     def circuit_handler(&block)
-      @circuit_handler ||= CircuitBreaker::CircuitHandler.new
+      @circuit_handler ||= circuit_handler_class.new
 
       yield @circuit_handler if block_given?
 
       return @circuit_handler
+    end
+
+    #
+    # Allows you to define a custom circuit_handler instead of CircuitBreaker::CircuitHandler
+    #
+    def circuit_handler_class(klass = nil)
+      @circuit_handler_class ||= (klass || CircuitBreaker::CircuitHandler)
     end
 
   end
