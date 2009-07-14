@@ -1,8 +1,9 @@
 = circuit_breaker
 
 * http://github.com/wsargent/circuit_breaker
-  Will Sargent <will.sargent@gmail.com>
-  Copyright 2009 Will Sargent
+* http://rdoc.info/projects/wsargent/circuit_breaker
+* Will Sargent <will.sargent@gmail.com>
+* Copyright 2009 Will Sargent
 
 == DESCRIPTION:
 
@@ -24,25 +25,25 @@
  immediately pop the circuit open again, and a success will close the
  circuit and reset the failure count.
 
- require 'circuit_breaker'
- class TestService
+     require 'circuit_breaker'
+     class TestService
 
-   include CircuitBreaker
+       include CircuitBreaker
 
-   def call_remote_service() ...
+       def call_remote_service() ...
 
-   circuit_method :call_remote_service
+       circuit_method :call_remote_service
+    
+       # Optional
+       circuit_handler do |handler|
+         handler.logger = Logger.new(STDOUT)
+         handler.failure_threshold = 5
+         handler.failure_timeout = 5
+       end
 
-   # Optional
-   circuit_handler do |handler|
-     handler.logger = Logger.new(STDOUT)
-     handler.failure_threshold = 5
-     handler.failure_timeout = 5
-   end
-
-   # Optional
-   circuit_handler_class MyCustomCircuitHandler
- end
+       # Optional
+       circuit_handler_class MyCustomCircuitHandler
+     end
 
 == FEATURES/PROBLEMS:
 
@@ -56,7 +57,7 @@
 
 == REQUIREMENTS:
 
-  circuit_breaker has a dependency on AASM (http://github.com/rubyist/aasm/tree/master).
+  circuit_breaker has a dependency on AASM @ http://github.com/rubyist/aasm/tree/master
 
 == INSTALL:
 
