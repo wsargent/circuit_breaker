@@ -1,5 +1,7 @@
 require File.dirname(__FILE__) + '/../unit_spec_helper'
 
+require 'logger'
+
 describe CircuitBreaker do
 
   class TestClass
