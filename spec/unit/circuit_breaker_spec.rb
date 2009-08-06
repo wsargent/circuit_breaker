@@ -42,7 +42,7 @@ describe CircuitBreaker do
     circuit_handler do |handler|
       handler.logger = Logger.new(STDOUT)
       handler.failure_threshold = 5
-      handler.failure_timeout = 5      
+      handler.failure_timeout = 5
     end
 
   end
