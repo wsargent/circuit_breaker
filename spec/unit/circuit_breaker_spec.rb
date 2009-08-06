@@ -28,13 +28,18 @@ describe CircuitBreaker do
       "hello world!"
     end
 
-   def second_method()
-     raise 'EPIC FAIL'
-   end
+    def second_method()
+      raise 'EPIC FAIL'
+    end
+
+    def unresponsive_method
+      sleep 1.1
+      "unresponsive method returned"
+    end
 
     # Register this method with the circuit breaker...
     #
-    circuit_method :call_external_method, :second_method
+    circuit_method :call_external_method, :second_method, :unresponsive_method
 
     #
     # Define what needs to be set for configuration...
@@ -43,6 +48,7 @@ describe CircuitBreaker do
       handler.logger = Logger.new(STDOUT)
       handler.failure_threshold = 5
       handler.failure_timeout = 5
+      handler.invocation_timeout = 1
     end
 
   end
@@ -106,6 +112,11 @@ describe CircuitBreaker do
       lambda { @test_object.call_external_method() }.should raise_error 
       @test_object.circuit_state.open?.should == true
       @test_object.circuit_state.failure_count.should == 1
+    end
+
+    it 'should trip the circuit when the method takes too long to return' do
+      lambda { @test_object.unresponsive_method }.should raise_error(CircuitBreaker::CircuitBrokenException)
+      @test_object.circuit_state.open?.should == true
     end
     
   end

@@ -24,6 +24,11 @@
  immediately pop the circuit open again, and a success will close the
  circuit and reset the failure count.
 
+ For services that can take an unmanagable amount of time to respond an
+ invocation timeout threshold is provided.  If the service fails to return
+ before the invocation_timeout duration has passed, the circuit will "trip",
+ setting the circuit into an "open" state.
+ 
      require 'circuit_breaker'
      class TestService
 
@@ -38,6 +43,7 @@
          handler.logger = Logger.new(STDOUT)
          handler.failure_threshold = 5
          handler.failure_timeout = 5
+         handler.invocation_timeout = 10
        end
 
        # Optional

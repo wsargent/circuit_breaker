@@ -1,3 +1,5 @@
+require 'timeout'
+
 #
 #
 # CircuitHandler is stateless,
@@ -17,17 +19,24 @@ class CircuitBreaker::CircuitHandler
   attr_accessor :failure_timeout
 
   #
+  # The period of time the circuit_method has to return before a timeout exception is thrown.
+  #
+  attr_accessor :invocation_timeout
+
+  #
   # Optional logger.
   #
   attr_accessor :logger
 
-  DEFAULT_FAILURE_THRESHOLD = 5
-  DEFAULT_FAILURE_TIMEOUT = 5
+  DEFAULT_FAILURE_THRESHOLD  = 5
+  DEFAULT_FAILURE_TIMEOUT    = 5
+  DEFAULT_INVOCATION_TIMEOUT = 30
 
   def initialize(logger = nil)
     @logger = logger
     @failure_threshold = DEFAULT_FAILURE_THRESHOLD
     @failure_timeout = DEFAULT_FAILURE_TIMEOUT
+    @invocation_timeout = DEFAULT_INVOCATION_TIMEOUT
   end
 
   #
@@ -47,8 +56,11 @@ class CircuitBreaker::CircuitHandler
     end
 
     begin
-      out = method[*args]
-      on_success(circuit_state)
+      out = nil
+      Timeout.timeout(@invocation_timeout, CircuitBreaker::CircuitBrokenException) do
+        out = method[*args]
+        on_success(circuit_state)
+      end
     rescue Exception
       on_failure(circuit_state)
       raise
