@@ -49,7 +49,7 @@
 # Many thanks to Devin Mullins
 #
 module CircuitBreaker
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
   
   #
   # Extends the included class with CircuitBreaker
