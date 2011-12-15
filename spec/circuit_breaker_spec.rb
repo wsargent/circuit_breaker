@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/../unit_spec_helper'
-
+require 'spec_helper'
 require 'logger'
 
 describe CircuitBreaker do
@@ -78,7 +77,7 @@ describe CircuitBreaker do
       @test_object.circuit_state.closed?.should == true
       @test_object.circuit_state.failure_count.should == 1
     end
-    
+
     it 'should trip the circuit when too many failures occur' do
       @test_object.fail!
 
@@ -109,7 +108,7 @@ describe CircuitBreaker do
       @test_object.fail!
 
       TestClass.circuit_handler.failure_threshold = 0
-      lambda { @test_object.call_external_method() }.should raise_error 
+      lambda { @test_object.call_external_method() }.should raise_error
       @test_object.circuit_state.open?.should == true
       @test_object.circuit_state.failure_count.should == 1
     end
@@ -118,7 +117,7 @@ describe CircuitBreaker do
       lambda { @test_object.unresponsive_method }.should raise_error(CircuitBreaker::CircuitBrokenException)
       @test_object.circuit_state.open?.should == true
     end
-    
+
   end
 
   describe "when open" do

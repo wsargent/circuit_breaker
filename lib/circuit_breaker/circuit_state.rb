@@ -55,6 +55,6 @@ class CircuitBreaker::CircuitState
   def reset_failure_count
     @failure_count = 0
   end
-  
+
 end
 

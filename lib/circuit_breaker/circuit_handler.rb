@@ -45,7 +45,7 @@ class CircuitBreaker::CircuitHandler
   def new_circuit_state
     ::CircuitBreaker::CircuitState.new
   end
-  
+
   #
   # Handles the method covered by the circuit breaker.
   #
@@ -104,7 +104,7 @@ class CircuitBreaker::CircuitHandler
   end
 
   #
-  # Called when an individual success happens. 
+  # Called when an individual success happens.
   #
   def on_success(circuit_state)
     @logger.debug("on_success: #{circuit_state.inspect}") if @logger
@@ -125,7 +125,7 @@ class CircuitBreaker::CircuitHandler
   #
   def on_failure(circuit_state)
     @logger.debug("on_failure: circuit_state = #{circuit_state.inspect}") if @logger
-    
+
     circuit_state.increment_failure_count
 
     if is_failure_threshold_reached(circuit_state) || circuit_state.half_open?
@@ -136,12 +136,12 @@ class CircuitBreaker::CircuitHandler
   end
 
   #
-  # Called when a call is made and the circuit is open.   Raises a CircuitBrokenException exception. 
+  # Called when a call is made and the circuit is open.   Raises a CircuitBrokenException exception.
   #
   def on_circuit_open(circuit_state)
     @logger.debug("on_circuit_open: raising for #{circuit_state.inspect}") if @logger
-        
+
     raise CircuitBreaker::CircuitBrokenException.new("Circuit broken, please wait for timeout", circuit_state)
   end
-   
+
 end

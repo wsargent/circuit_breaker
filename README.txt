@@ -28,7 +28,7 @@
  invocation timeout threshold is provided.  If the service fails to return
  before the invocation_timeout duration has passed, the circuit will "trip",
  setting the circuit into an "open" state.
- 
+
      require 'circuit_breaker'
      class TestService
 
@@ -37,7 +37,7 @@
        def call_remote_service() ...
 
        circuit_method :call_remote_service
-    
+
        # Optional
        circuit_handler do |handler|
          handler.logger = Logger.new(STDOUT)
@@ -66,9 +66,7 @@
 
 == INSTALL:
 
-* gem sources -a http://gems.github.com
-* gem install rubyist-aasm
-* gem install wsargent_circuit-breaker
+* gem install circuit-breaker
 
 == LICENSE:
 

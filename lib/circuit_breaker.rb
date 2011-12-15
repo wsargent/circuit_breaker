@@ -48,9 +48,10 @@
 # Author: Will Sargent <will.sargent@gmail.com>
 # Many thanks to Devin Mullins
 #
+
+require 'circuit_breaker/version'
+
 module CircuitBreaker
-  VERSION = '1.0.1'
-  
   #
   # Extends the included class with CircuitBreaker
   #
