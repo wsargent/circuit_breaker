@@ -5,7 +5,7 @@ require 'circuit_breaker/version'
 Gem::Specification.new do |s|
   s.name        = %q{circuit_breaker}
   s.version     = CircuitBreaker::VERSION
-  s.date        = %q{2009-07-13}
+  s.date        = %q{2011-01-05}
 
   s.authors     = ["Will Sargent"]
   s.email       = ["will.sargent@gmail.com"]
