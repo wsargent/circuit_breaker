@@ -44,6 +44,7 @@
          handler.failure_threshold = 5
          handler.failure_timeout = 5
          handler.invocation_timeout = 10
+         handler.excluded_exceptions = [NotConsideredFailureException]
        end
 
        # Optional

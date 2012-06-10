@@ -24,6 +24,11 @@ class CircuitBreaker::CircuitHandler
   attr_accessor :invocation_timeout
 
   #
+  # The exceptions which should be ignored if happens, they are not counted as failures
+  #
+  attr_accessor :excluded_exceptions
+
+  #
   # Optional logger.
   #
   attr_accessor :logger
@@ -31,12 +36,14 @@ class CircuitBreaker::CircuitHandler
   DEFAULT_FAILURE_THRESHOLD  = 5
   DEFAULT_FAILURE_TIMEOUT    = 5
   DEFAULT_INVOCATION_TIMEOUT = 30
+  DEFAULT_EXCLUDED_EXCEPTIONS= []
 
   def initialize(logger = nil)
     @logger = logger
     @failure_threshold = DEFAULT_FAILURE_THRESHOLD
     @failure_timeout = DEFAULT_FAILURE_TIMEOUT
     @invocation_timeout = DEFAULT_INVOCATION_TIMEOUT
+    @excluded_exceptions = DEFAULT_EXCLUDED_EXCEPTIONS
   end
 
   #
@@ -61,8 +68,8 @@ class CircuitBreaker::CircuitHandler
         out = method[*args]
         on_success(circuit_state)
       end
-    rescue Exception
-      on_failure(circuit_state)
+    rescue Exception => e
+      on_failure(circuit_state) unless @excluded_exceptions.include?(e.class)
       raise
     end
     return out
