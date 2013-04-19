@@ -41,7 +41,7 @@ describe CircuitBreaker do
 
     def raise_specific_error_method
       if @failure == true
-        raise SpecificException.new "SPECIFC FAIL"
+        raise SpecificException.new "SPECIFIC FAIL"
       end
 
       raise NotFoundException.new "NOT FOUND FAIL"
