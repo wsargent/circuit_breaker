@@ -1,3 +1,7 @@
+=== 1.1.0 / 2013-04-18
+
+* Feature to ignore specified exceptions (wandenberg)
+
 === 1.0.1 / 2011-01-05
 
 * Gem dependency issue "rubyist-aasm" is now "aasm" (ttdonovan)
