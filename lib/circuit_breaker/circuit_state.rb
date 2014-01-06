@@ -9,32 +9,32 @@ class CircuitBreaker::CircuitState
 
   include AASM
 
-  aasm_state :half_open
+  aasm.state :half_open
 
-  aasm_state :open
+  aasm.state :open
 
-  aasm_state :closed, :enter => :reset_failure_count
+  aasm.state :closed, :enter => :reset_failure_count
 
-  aasm_initial_state :closed
+  aasm.initial_state :closed
 
   #
   # Trips the circuit breaker into the open state where it will immediately fail.
   #
-  aasm_event :trip do
+  aasm.event :trip do
     transitions :to => :open, :from => [:closed, :half_open]
   end
 
   #
   # Transitions from an open state to a half_open state.
   #
-  aasm_event :attempt_reset do
+  aasm.event :attempt_reset do
     transitions :to => :half_open, :from => [:open]
   end
 
   #
   # Close the circuit from an open or half open state.
   #
-  aasm_event :reset do
+  aasm.event :reset do
     transitions :to => :closed, :from => [:open, :half_open]
   end
 
