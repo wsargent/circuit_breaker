@@ -108,3 +108,4 @@ end
 require 'circuit_breaker/circuit_handler'
 require 'circuit_breaker/circuit_broken_exception'
 require 'circuit_breaker/circuit_state'
+require 'circuit_breaker/failure_state'

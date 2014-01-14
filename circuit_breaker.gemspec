@@ -56,8 +56,8 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.extra_rdoc_files = ["History.txt", "README.txt"]
-  s.rdoc_options = ["--main", "README.txt", "--charset=UTF-8"]
+  s.extra_rdoc_files = ["History.txt", "README.md"]
+  s.rdoc_options = ["--main", "README.md", "--charset=UTF-8"]
 
   s.add_runtime_dependency "aasm"
 

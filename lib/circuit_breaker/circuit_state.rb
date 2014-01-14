@@ -38,22 +38,34 @@ class CircuitBreaker::CircuitState
     transitions :to => :closed, :from => [:open, :half_open]
   end
 
-  def initialize()
-    @failure_count = 0
-    @last_failure_time = nil
+  def initialize(failure_state = CircuitBreaker::FailureState.new)
+    @failure_state = failure_state
   end
 
-  attr_accessor :last_failure_time
+  attr_reader :failure_state
 
-  attr_accessor :failure_count
+  def last_failure_time
+    failure_state.last_failure_time
+  end
+
+  def last_failure_time=(value)
+    failure_state.last_failure_time = value
+  end
+
+  def failure_count
+    failure_state.failure_count
+  end
+
+  def failure_count=(value)
+    failure_state.failure_count = value
+  end
 
   def increment_failure_count
-    @failure_count = @failure_count + 1
-    @last_failure_time = Time.now
+    failure_state.increment_failure_count
   end
 
   def reset_failure_count
-    @failure_count = 0
+    failure_state.reset_failure_count
   end
 
 end
