@@ -47,9 +47,13 @@ describe CircuitBreaker do
       raise NotFoundException.new "NOT FOUND FAIL"
     end
 
+   def method_that_takes_a_block
+     yield
+   end
+
     # Register this method with the circuit breaker...
     #
-    circuit_method :call_external_method, :second_method, :unresponsive_method, :raise_specific_error_method
+    circuit_method :call_external_method, :second_method, :unresponsive_method, :raise_specific_error_method, :method_that_takes_a_block
 
     #
     # Define what needs to be set for configuration...
@@ -148,6 +152,19 @@ describe CircuitBreaker do
       end
     end
 
+    describe 'blocks' do
+      it 'should call block' do
+        called = false
+        @test_object.method_that_takes_a_block{ called = true }
+
+        called.should be_true
+      end
+      it 'increments failures' do
+        lambda { @test_object.method_that_takes_a_block{ raise SpecificException } }.should raise_error(SpecificException)
+
+        @test_object.circuit_state.failure_count.should == 1
+      end
+    end
   end
 
   describe "when open" do
