@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version     = CircuitBreaker::VERSION
   s.date        = %q{2013-04-13}
 
-  s.authors     = ["Will Sargent"]
-  s.email       = ["will.sargent@gmail.com"]
+  s.authors     = ['Will Sargent']
+  s.email       = ['will.sargent@gmail.com']
   s.homepage    = %q{http://github.com/wsargent/circuit_breaker}
   s.summary     = %q{CircuitBreaker is a relatively simple Ruby mixin that will wrap a call to a given service in a circuit breaker pattern}
   s.description = %q{CircuitBreaker is a relatively simple Ruby mixin that will wrap
@@ -54,13 +54,16 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
+  s.require_paths = ['lib']
 
-  s.extra_rdoc_files = ["History.txt", "README.md"]
-  s.rdoc_options = ["--main", "README.md", "--charset=UTF-8"]
+  s.extra_rdoc_files = ['History.txt', 'README.md']
+  s.rdoc_options = ['--main', 'README.md', '--charset=UTF-8']
 
-  s.add_runtime_dependency "aasm"
+  s.add_runtime_dependency 'aasm'
 
-  s.add_development_dependency "rake"
-  s.add_development_dependency "rspec"
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'pry'
+  s.add_development_dependency 'pry-debugger'
+
 end

@@ -68,5 +68,9 @@ class CircuitBreaker::CircuitState
     failure_state.reset_failure_count
   end
 
+  def current_state
+    aasm.current_state
+  end
+
 end
 
