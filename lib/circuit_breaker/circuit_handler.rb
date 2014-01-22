@@ -11,6 +11,8 @@ class CircuitBreaker::CircuitHandler
   class NullLogger
     def debug(*args)
     end
+    def info(*args)
+    end
   end
 
   #
@@ -63,7 +65,7 @@ class CircuitBreaker::CircuitHandler
   #
   def handle(circuit_state, method, *args, &block)
     if is_tripped(circuit_state)
-      @logger.debug("handle: breaker is tripped, refusing to execute: #{circuit_state.inspect}")
+      @logger.info("handle: breaker is tripped, refusing to execute: #{circuit_state.inspect}")
       on_circuit_open(circuit_state)
     end
 
@@ -85,7 +87,7 @@ class CircuitBreaker::CircuitHandler
   #
   def is_failure_threshold_reached(circuit_state)
     out = (circuit_state.failure_count > failure_threshold)
-    @logger.debug("is_failure_threshold_reached=#{out}: #{circuit_state.failure_count} > #{failure_threshold}")
+    @logger.info("is_failure_threshold_reached=#{out}: #{circuit_state.failure_count} > #{failure_threshold}")
 
     return out
   end
@@ -101,7 +103,7 @@ class CircuitBreaker::CircuitHandler
     time_since    = now - circuit_state.last_failure_time
     attempt_reset = time_since >= failure_timeout
 
-    @logger.debug("attempt_reset?=#{attempt_reset} #{attempt_reset ? 'timeout_exceeded' : 'timeout_still_in_progress'}:  time since last failure=#{time_since.inspect}")
+    @logger.info("attempt_reset?=#{attempt_reset} #{attempt_reset ? 'timeout_exceeded' : 'timeout_still_in_progress'}:  time since last failure=#{time_since.inspect}")
 
     attempt_reset
   end
@@ -113,7 +115,7 @@ class CircuitBreaker::CircuitHandler
   def is_tripped(circuit_state)
 
     if attempt_reset?(circuit_state)
-      @logger.debug("is_tripped: attempting reset into half open state for #{circuit_state.inspect}")
+      @logger.info("is_tripped: attempting reset into half open state for #{circuit_state.inspect}")
       circuit_state.attempt_reset
     end
 
@@ -132,7 +134,7 @@ class CircuitBreaker::CircuitHandler
     end
 
     if circuit_state.half_open?
-      @logger.debug("on_success: state=half_open reset #{circuit_state.inspect}")
+      @logger.info("on_success: state=half_open reset #{circuit_state.inspect}")
       circuit_state.reset
     end
   end
@@ -149,7 +151,7 @@ class CircuitBreaker::CircuitHandler
 
     if is_failure_threshold_reached(circuit_state) || circuit_state.half_open?
       # Set us into a closed state.
-      @logger.debug("on_failure: state=#{current_state} tripping circuit breaker #{circuit_state.inspect}")
+      @logger.info("on_failure: state=#{current_state} tripping circuit breaker #{circuit_state.inspect}")
       circuit_state.trip
     end
   end
@@ -158,7 +160,7 @@ class CircuitBreaker::CircuitHandler
   # Called when a call is made and the circuit is open.   Raises a CircuitBrokenException exception.
   #
   def on_circuit_open(circuit_state)
-    @logger.debug("on_circuit_open: raising for #{circuit_state.inspect}")
+    @logger.info("on_circuit_open: raising for #{circuit_state.inspect}")
 
     raise CircuitBreaker::CircuitBrokenException.new('Circuit broken, please wait for timeout', circuit_state)
   end
