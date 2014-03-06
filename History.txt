@@ -1,3 +1,8 @@
+=== 1.1.1 / 2014-03-06
+
+* Fix for how exceptions are handled in timeout / 9ae32e2 (mswain)
+* Fix for deprecated AASM methods (AASM 4.0.0 uses new ones) / #5 (celiofonseca)
+
 === 1.1.0 / 2013-04-18
 
 * Feature to ignore specified exceptions (wandenberg)
