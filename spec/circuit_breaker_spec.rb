@@ -75,6 +75,17 @@ describe CircuitBreaker do
     @test_object.circuit_state.failure_count.should == 1
   end
 
+  it 'should not raise warning about method redefined' do
+    orig_stderr = $stderr
+    $stderr = StringIO.new
+
+    TestClass.circuit_method :second_method
+
+    $stderr.rewind
+    $stderr.string.chomp.should_not match(/warning: previous definition of second_method was here/)
+    $stderr = orig_stderr
+  end
+
   describe "when closed" do
 
     it "should execute without failing" do
