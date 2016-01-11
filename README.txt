@@ -67,7 +67,7 @@
 
 == INSTALL:
 
-* gem install circuit-breaker
+* gem install circuit_breaker
 
 == LICENSE:
 
