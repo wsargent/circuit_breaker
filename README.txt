@@ -71,7 +71,7 @@
 
 == LICENSE:
 
-Copyright (c) 2009, Will Sargent
+Copyright (c) 2016, Will Sargent
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the

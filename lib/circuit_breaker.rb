@@ -44,7 +44,7 @@
 #
 # end
 #
-# Copyright 2009 Will Sargent
+# Copyright 2016 Will Sargent
 # Author: Will Sargent <will.sargent@gmail.com>
 # Many thanks to Devin Mullins
 #

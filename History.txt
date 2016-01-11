@@ -1,3 +1,7 @@
+=== 1.1.2 / 2016-01-10
+
+* Undefine methods before redefine them to avoid warnings on Ruby 2.3
+
 === 1.1.1 / 2014-03-06
 
 * Fix for how exceptions are handled in timeout / 9ae32e2 (mswain)
