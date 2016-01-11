@@ -77,6 +77,7 @@ module CircuitBreaker
 
       methods.each do |meth|
         m = instance_method meth
+        undef_method(meth) if method_defined?(meth)
         define_method meth do |*args|
           circuit_handler.handle self.circuit_state, m.bind(self), *args
         end
