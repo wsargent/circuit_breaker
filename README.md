@@ -63,7 +63,7 @@ An implementation of Michael Nygard's Circuit Breaker pattern.
 
 ## REQUIREMENTS:
 
-circuit_breaker has a dependency on AASM @ http://github.com/rubyist/aasm/tree/master
+None. curcuit_breaker no longer depends on [AASM](http://github.com/rubyist/aasm/tree/master) but will raise AASM::InvalidTransition if that exception is defined.
 
 ## INSTALL:
 
