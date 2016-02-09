@@ -59,8 +59,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["History.txt", "README.txt"]
   s.rdoc_options = ["--main", "README.txt", "--charset=UTF-8"]
 
-  s.add_runtime_dependency "aasm"
-
+  s.add_development_dependency "aasm"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
 end
