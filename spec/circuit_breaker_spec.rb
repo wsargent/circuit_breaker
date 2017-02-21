@@ -86,6 +86,21 @@ describe CircuitBreaker do
     $stderr = orig_stderr
   end
 
+  it 'should create a percentage-based trip checker when those values are provided' do
+    TestClass.circuit_handler.failure_percentage_threshold = 0.5
+    @test_object = TestClass.new
+
+    5.times { @test_object.call_external_method }
+    @test_object.fail!
+    5.times { expect { @test_object.call_external_method }.to raise_error(RuntimeError) }
+
+    expect(@test_object.circuit_state.closed?).to be(true)
+    expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+
+    expect(@test_object.circuit_state.open?).to be(true)
+    expect(@test_object.circuit_state.failure_count).to eq(6)
+  end
+
   describe "when closed" do
 
     it "should execute without failing" do
