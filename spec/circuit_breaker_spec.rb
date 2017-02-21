@@ -64,98 +64,108 @@ describe CircuitBreaker do
 
   end
 
+  class TestMultiClass
+    include CircuitBreaker
+
+    def fail!
+      raise 'FAIL'
+    end
+
+    circuit_method :fail!
+  end
+
   before(:each) do
     TestClass.circuit_handler.failure_threshold = 5
     @test_object = TestClass.new()
   end
 
   it 'should call second_method and have it run through the circuit breaker' do
-    lambda { @test_object.second_method() }.should raise_error("EPIC FAIL")
-    @test_object.circuit_state.closed?.should == true
-    @test_object.circuit_state.failure_count.should == 1
+    expect { @test_object.second_method() }.to raise_error('EPIC FAIL')
+    expect(@test_object.circuit_state.closed?).to be(true)
+    expect(@test_object.circuit_state.failure_count).to eq(1)
   end
 
   it 'should not raise warning about method redefined' do
     orig_stderr = $stderr
     $stderr = StringIO.new
 
-    TestClass.circuit_method :second_method
+    TestMultiClass.circuit_method :fail!
 
     $stderr.rewind
-    $stderr.string.chomp.should_not match(/warning: previous definition of second_method was here/)
+    expect($stderr.string.chomp).not_to match(/warning: previous definition of fail! was here/)
     $stderr = orig_stderr
   end
 
   describe "when closed" do
 
     it "should execute without failing" do
-      @test_object.call_external_method().should == 'hello world!'
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 0
+      expect(@test_object.call_external_method).to eq('hello world!')
+      expect(@test_object.circuit_state.closed?).to be(true)
+      expect(@test_object.circuit_state.failure_count).to eq(0)
     end
 
     it 'should increment the failure count when a failure occurs' do
       @test_object.fail!
 
-      lambda { @test_object.call_external_method() }.should raise_error
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      expect { @test_object.call_external_method() }.to raise_error(RuntimeError)
+      expect(@test_object.circuit_state.closed?).to be(true)
+      expect(@test_object.circuit_state.failure_count).to eq(1)
     end
 
     it 'should trip the circuit when too many failures occur' do
       @test_object.fail!
 
-      lambda { @test_object.call_external_method() }.should raise_error
-      lambda { @test_object.call_external_method() }.should raise_error
-      lambda { @test_object.call_external_method() }.should raise_error
-      lambda { @test_object.call_external_method() }.should raise_error
-      lambda { @test_object.call_external_method() }.should raise_error
-      lambda { @test_object.call_external_method() }.should raise_error
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
 
-      @test_object.circuit_state.open?.should == true
-      @test_object.circuit_state.failure_count.should == 6
+      expect(@test_object.circuit_state.open?).to be(true)
+      expect(@test_object.circuit_state.failure_count).to eq(6)
     end
 
     it 'should reset the failure count if closed after a successful call.' do
       @test_object.fail!
 
-      lambda { @test_object.call_external_method() }.should raise_error("FAIL")
+      expect { @test_object.call_external_method() }.to raise_error('FAIL')
 
       @test_object.succeed!
-      @test_object.call_external_method()
+      @test_object.call_external_method
 
-      @test_object.circuit_state.failure_count.should == 0
-      @test_object.circuit_state.closed?.should == true
+      expect(@test_object.circuit_state.failure_count).to eq(0)
+      expect(@test_object.circuit_state.closed?).to be(true)
     end
 
     it 'should trip immediately when the failure threshold is set to zero' do
       @test_object.fail!
 
       TestClass.circuit_handler.failure_threshold = 0
-      lambda { @test_object.call_external_method() }.should raise_error
-      @test_object.circuit_state.open?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      expect { @test_object.call_external_method }.to raise_error(RuntimeError)
+      expect(@test_object.circuit_state.open?).to be(true)
+      expect(@test_object.circuit_state.failure_count).to eq(1)
     end
 
     it 'should increment the failure count when the method takes too long to return' do
-      lambda { @test_object.unresponsive_method }.should raise_error(CircuitBreaker::CircuitBrokenException)
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      expect { @test_object.unresponsive_method }.to raise_error(CircuitBreaker::CircuitBrokenException)
+      expect(@test_object.circuit_state.closed?).to be(true)
+      expect(@test_object.circuit_state.failure_count).to eq(1)
     end
 
     describe "and some exceptions not indicates a circuit problem" do
       it 'should not increment the failure count when a failure of a specific type occurs' do
         @test_object.fail!
 
-        lambda { @test_object.raise_specific_error_method }.should raise_error(SpecificException)
-        @test_object.circuit_state.closed?.should == true
-        @test_object.circuit_state.failure_count.should == 1
+        expect { @test_object.raise_specific_error_method }.to raise_error(SpecificException)
+        expect(@test_object.circuit_state.closed?).to be(true)
+        expect(@test_object.circuit_state.failure_count).to eq(1)
 
         @test_object.succeed!
 
-        lambda { @test_object.raise_specific_error_method }.should raise_error(NotFoundException)
-        @test_object.circuit_state.closed?.should == true
-        @test_object.circuit_state.failure_count.should == 1
+        expect { @test_object.raise_specific_error_method }.to raise_error(NotFoundException)
+        expect(@test_object.circuit_state.closed?).to be(true)
+        expect(@test_object.circuit_state.failure_count).to eq(1)
       end
     end
 
@@ -170,11 +180,11 @@ describe CircuitBreaker do
       @test_object.circuit_state.failure_count = 5
 
       # Should return CircuitBrokenException explicitly
-      lambda { @test_object.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
+      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitBrokenException)
 
       # Failure count should not be open
-      @test_object.circuit_state.failure_count.should == 5
-      @test_object.circuit_state.open?.should == true
+      expect(@test_object.circuit_state.failure_count).to eq(5)
+      expect(@test_object.circuit_state.open?).to be(true)
     end
 
     it 'should not reset the circuit when not enough time has passed' do
@@ -185,10 +195,10 @@ describe CircuitBreaker do
       @test_object.circuit_state.last_failure_time = now - failure_threshold
       @test_object.circuit_state.failure_count = 5
 
-      lambda { @test_object.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
+      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitBrokenException)
 
-      @test_object.circuit_state.failure_count.should == 5
-      @test_object.circuit_state.open?.should == true
+      expect(@test_object.circuit_state.failure_count).to eq(5)
+      expect(@test_object.circuit_state.open?).to be(true)
     end
 
   end
@@ -207,8 +217,8 @@ describe CircuitBreaker do
       @test_object.call_external_method()
 
       # After a successful call, the failure count is reset.
-      @test_object.circuit_state.failure_count.should == 0
-      @test_object.circuit_state.closed?.should == true
+      expect(@test_object.circuit_state.failure_count).to eq(0)
+      expect(@test_object.circuit_state.closed?).to be(true)
     end
 
     it 'should trip the circuit immediately if in a half open state' do
@@ -223,12 +233,12 @@ describe CircuitBreaker do
 
       # Have an unsuccessful call...
       @test_object.fail!
-      lambda { @test_object.call_external_method() }.should raise_error("FAIL")
+      expect { @test_object.call_external_method() }.to raise_error("FAIL")
 
-      @test_object.circuit_state.failure_count.should == 6
+      expect(@test_object.circuit_state.failure_count).to eq(6)
 
       # The circuit should immediately pop open again.
-      @test_object.circuit_state.open?.should == true
+      expect(@test_object.circuit_state.open?).to be(true)
     end
 
   end
