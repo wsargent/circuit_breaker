@@ -127,7 +127,7 @@ class CircuitBreaker::CircuitHandler
     @logger.debug("on_success: #{circuit_state.inspect}") if @logger
 
     if circuit_state.closed?
-      @logger.debug("on_success: reset_counts #{circuit_state.inspect}") if @logger
+      @logger.debug("on_success: reset_failure_count #{circuit_state.inspect}") if @logger
       circuit_state.reset_failure_count
     end
 
