@@ -41,11 +41,18 @@ class CircuitBreaker::CircuitState
   def initialize()
     @failure_count = 0
     @last_failure_time = nil
+    @call_count = 0
   end
 
   attr_accessor :last_failure_time
 
   attr_accessor :failure_count
+
+  attr_accessor :call_count
+
+  def increment_call_count
+    @call_count += 1
+  end
 
   def increment_failure_count
     @failure_count = @failure_count + 1
@@ -56,5 +63,8 @@ class CircuitBreaker::CircuitState
     @failure_count = 0
   end
 
+  def reset_counts
+    reset_failure_count
+    @call_count = 0
+  end
 end
-

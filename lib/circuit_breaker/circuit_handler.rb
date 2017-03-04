@@ -11,7 +11,17 @@ class CircuitBreaker::CircuitHandler
   #
   # The number of failures needed to trip the breaker.
   #
-  attr_accessor :failure_threshold
+  attr_reader :failure_threshold
+
+  #
+  # The percentage of failures needed to trip the breaker.
+  #
+  attr_reader :failure_percentage_threshold
+
+  #
+  # The minimum number of calls required to trip a percentage checker.
+  #
+  attr_accessor :failure_percentage_minimum
 
   #
   # The period of time in seconds before attempting to reset the breaker.
@@ -33,17 +43,26 @@ class CircuitBreaker::CircuitHandler
   #
   attr_accessor :logger
 
-  DEFAULT_FAILURE_THRESHOLD  = 5
-  DEFAULT_FAILURE_TIMEOUT    = 5
-  DEFAULT_INVOCATION_TIMEOUT = 30
-  DEFAULT_EXCLUDED_EXCEPTIONS= []
+  #
+  # The object that determines whether or not the circuit has been tripped
+  #
+  attr_accessor :trip_checker
+
+  DEFAULT_FAILURE_THRESHOLD          = 5
+  DEFAULT_FAILURE_TIMEOUT            = 5
+  DEFAULT_INVOCATION_TIMEOUT         = 30
+  DEFAULT_EXCLUDED_EXCEPTIONS        = []
+  DEFAULT_FAILURE_PERCENTAGE_MINIMUM = 3
 
   def initialize(logger = nil)
     @logger = logger
-    @failure_threshold = DEFAULT_FAILURE_THRESHOLD
     @failure_timeout = DEFAULT_FAILURE_TIMEOUT
     @invocation_timeout = DEFAULT_INVOCATION_TIMEOUT
     @excluded_exceptions = DEFAULT_EXCLUDED_EXCEPTIONS
+
+    @failure_threshold = DEFAULT_FAILURE_THRESHOLD
+    @failure_percentage_minimum = DEFAULT_FAILURE_PERCENTAGE_MINIMUM
+    self.failure_threshold = failure_threshold
   end
 
   #
@@ -62,6 +81,7 @@ class CircuitBreaker::CircuitHandler
       on_circuit_open(circuit_state)
     end
 
+    circuit_state.increment_call_count
     begin
       out = nil
       Timeout.timeout(@invocation_timeout, CircuitBreaker::CircuitBrokenException) do
@@ -72,16 +92,6 @@ class CircuitBreaker::CircuitHandler
       on_failure(circuit_state) unless @excluded_exceptions.include?(e.class)
       raise
     end
-    return out
-  end
-
-  #
-  # Returns true when the number of failures is sufficient to trip the breaker, false otherwise.
-  #
-  def is_failure_threshold_reached(circuit_state)
-    out = (circuit_state.failure_count > failure_threshold)
-    @logger.debug("is_failure_threshold_reached: #{circuit_state.failure_count} > #{failure_threshold} == #{out}") if @logger
-
     return out
   end
 
@@ -135,7 +145,7 @@ class CircuitBreaker::CircuitHandler
 
     circuit_state.increment_failure_count
 
-    if is_failure_threshold_reached(circuit_state) || circuit_state.half_open?
+    if trip_checker.tripped?(circuit_state) || circuit_state.half_open?
       # Set us into a closed state.
       @logger.debug("on_failure: tripping circuit breaker #{circuit_state.inspect}") if @logger
       circuit_state.trip
@@ -151,4 +161,17 @@ class CircuitBreaker::CircuitHandler
     raise CircuitBreaker::CircuitBrokenException.new("Circuit broken, please wait for timeout", circuit_state)
   end
 
+  #
+  # Sets the trip checker to be a "count" checker with the specified value
+  #
+  def failure_threshold=(value)
+    @trip_checker = ::CircuitBreaker::TripChecker::Count.new(logger, value)
+  end
+
+  #
+  # Sets the trip checker to be a "percentage" checker with the specified value
+  #
+  def failure_percentage_threshold=(value)
+    @trip_checker = ::CircuitBreaker::TripChecker::Percentage.new(logger, value, failure_percentage_minimum)
+  end
 end
