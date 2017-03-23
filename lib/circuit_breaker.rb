@@ -64,7 +64,7 @@ module CircuitBreaker
   # you can have several instances of the same class with different states.
   #
   def circuit_state
-    @circuit_state ||= self.class.circuit_handler.new_circuit_state
+    @circuit_state ||= CircuitBreaker::CircuitState.new
   end
 
   module ClassMethods
