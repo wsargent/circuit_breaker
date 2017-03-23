@@ -55,12 +55,12 @@ class CircuitBreaker::CircuitState
   end
 
   def increment_failure_count
-    @failure_count = @failure_count + 1
-    @last_failure_time = Time.now
+    self.failure_count = self.failure_count + 1
+    self.last_failure_time = Time.now
   end
 
   def reset_failure_count
-    @failure_count = 0
+    self.failure_count = 0
   end
 
   def reset_counts
