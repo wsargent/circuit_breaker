@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
  the circuit will "trip", setting the circuit into an "open" state.
 
  In an "open" state, every call to the service will fail by raising
- CircuitBrokenException.
+ CircuitOpenException.
 
  The circuit will remain in an "open" state until the failure timeout has
  elapsed.

@@ -163,7 +163,7 @@ describe CircuitBreaker do
     end
 
     it 'should increment the failure count when the method takes too long to return' do
-      expect { @test_object.unresponsive_method }.to raise_error(CircuitBreaker::CircuitBrokenException)
+      expect { @test_object.unresponsive_method }.to raise_error(CircuitBreaker::InvocationTimeoutException)
       expect(@test_object.circuit_state.closed?).to be(true)
       expect(@test_object.circuit_state.failure_count).to eq(1)
     end
@@ -194,8 +194,8 @@ describe CircuitBreaker do
       @test_object.circuit_state.last_failure_time = now
       @test_object.circuit_state.failure_count = 5
 
-      # Should return CircuitBrokenException explicitly
-      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitBrokenException)
+      # Should return CircuitOpenException explicitly
+      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitOpenException)
 
       # Failure count should not be open
       expect(@test_object.circuit_state.failure_count).to eq(5)
@@ -210,7 +210,7 @@ describe CircuitBreaker do
       @test_object.circuit_state.last_failure_time = now - failure_threshold
       @test_object.circuit_state.failure_count = 5
 
-      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitBrokenException)
+      expect { @test_object.call_external_method() }.to raise_error(::CircuitBreaker::CircuitOpenException)
 
       expect(@test_object.circuit_state.failure_count).to eq(5)
       expect(@test_object.circuit_state.open?).to be(true)

@@ -84,7 +84,7 @@ class CircuitBreaker::CircuitHandler
     circuit_state.increment_call_count
     begin
       out = nil
-      Timeout.timeout(@invocation_timeout, CircuitBreaker::CircuitBrokenException) do
+      Timeout.timeout(@invocation_timeout, CircuitBreaker::InvocationTimeoutException) do
         out = method[*args]
         on_success(circuit_state)
       end
@@ -153,12 +153,12 @@ class CircuitBreaker::CircuitHandler
   end
 
   #
-  # Called when a call is made and the circuit is open.   Raises a CircuitBrokenException exception.
+  # Called when a call is made and the circuit is open.   Raises a CircuitOpenException exception.
   #
   def on_circuit_open(circuit_state)
     @logger.debug("on_circuit_open: raising for #{circuit_state.inspect}") if @logger
 
-    raise CircuitBreaker::CircuitBrokenException.new("Circuit broken, please wait for timeout", circuit_state)
+    raise CircuitBreaker::CircuitOpenException.new("Circuit broken, please wait for timeout", circuit_state)
   end
 
   #
