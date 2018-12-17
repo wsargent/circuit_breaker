@@ -20,20 +20,26 @@ class CircuitBreaker::CircuitState
     end
   end
 
+  #
+  # Trips the circuit breaker into the open state where it will immediately fail.
+  #
   def trip
     raise invalid_transition_exception("trip") unless can_transition_to?(:open)
     @state = :open
   end
+  alias trip! trip
 
-  def trip!
-    trip
-  end
-
+  #
+  # Transitions from an open state to a half_open state.
+  #
   def attempt_reset
     raise invalid_transition_exception("attempt_reset") unless can_transition_to?(:half_open)
     @state = :half_open
   end
 
+  #
+  # Close the circuit from an open or half open state.
+  #
   def reset
     raise invalid_transition_exception("reset") unless can_transition_to?(:closed)
     @state = :closed
@@ -41,11 +47,11 @@ class CircuitBreaker::CircuitState
   end
 
   # if AASM is required elsewhere it will call this method to get current state
-  def aasm(_)
+  def aasm(*)
     OpenStruct.new(current_state: @state)
   end
 
-  def initialize()
+  def initialize
     @failure_count = 0
     @last_failure_time = nil
     @call_count = 0
