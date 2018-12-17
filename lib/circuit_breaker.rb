@@ -108,7 +108,7 @@ end
 
 require 'circuit_breaker/circuit_handler'
 require 'circuit_breaker/circuit_broken_exception'
-require 'circuit_breaker/invalid_transition'
+require 'circuit_breaker/errors'
 require 'circuit_breaker/circuit_state'
 
 require 'circuit_breaker/trip_checker/count'

@@ -89,23 +89,6 @@ class CircuitBreaker::CircuitState
   end
 
   def invalid_transition_exception_class
-    aasm_exception_defined? ? aasm_exception_class : default_exception_class
-  end
-
-  def aasm_exception_defined?
-    @aasm_exception_defined ||= begin
-      aasm_exception_class
-      true
-    rescue NameError
-      false
-    end
-  end
-
-  def aasm_exception_class
-    AASM::InvalidTransition
-  end
-
-  def default_exception_class
     CircuitBreaker::InvalidTransition
   end
 end

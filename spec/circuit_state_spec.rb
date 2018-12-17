@@ -23,7 +23,7 @@ describe CircuitBreaker::CircuitState do
     end
 
     if defined?(AASM::InvalidTransition)
-      it "raises an AASM::InvalidTransition if AASM is defined" do
+      it "when AASM is defined, raises an AASM::InvalidTransition exception if invoked from :open" do
         subject.trip
         expect { subject.trip }.to raise_error(AASM::InvalidTransition)
       end
