@@ -4,53 +4,6 @@
 # has tripped or not.
 #
 class CircuitBreaker::CircuitState
-  STATES = %i(open half_open closed)
-
-  #the state transition map, to: [:from]
-  TRANSITIONS = {
-    open: [:closed, :half_open],
-    half_open: [:open],
-    closed: [:open, :half_open]
-  }
-
-  # define #open?, :closed?, :half_open?
-  STATES.each do |state|
-    define_method("#{state}?") do
-      @state == state
-    end
-  end
-
-  #
-  # Trips the circuit breaker into the open state where it will immediately fail.
-  #
-  def trip
-    raise invalid_transition_exception("trip") unless can_transition_to?(:open)
-    @state = :open
-  end
-  alias trip! trip
-
-  #
-  # Transitions from an open state to a half_open state.
-  #
-  def attempt_reset
-    raise invalid_transition_exception("attempt_reset") unless can_transition_to?(:half_open)
-    @state = :half_open
-  end
-
-  #
-  # Close the circuit from an open or half open state.
-  #
-  def reset
-    raise invalid_transition_exception("reset") unless can_transition_to?(:closed)
-    @state = :closed
-    reset_failure_count
-  end
-
-  # if AASM is required elsewhere it will call this method to get current state
-  def aasm(*)
-    OpenStruct.new(current_state: @state)
-  end
-
   def initialize
     @failure_count = 0
     @last_failure_time = nil
@@ -82,12 +35,56 @@ class CircuitBreaker::CircuitState
     @call_count = 0
   end
 
+  def current_state
+    @state
+  end
+
+  # define #open?, :closed?, :half_open?
+  STATES = %i(open half_open closed).each do |state|
+    define_method("#{state}?") do
+      @state == state
+    end
+  end
+
+  #the state transition map, to: [:from]
+  TRANSITIONS = {
+    trip: { open: [:closed, :half_open] },
+    attempt_reset: { half_open: [:open] },
+    reset: { closed: [:open, :half_open] },
+  }
+
+  #
+  # Trips the circuit breaker into the open state where it will immediately fail.
+  #
+  def trip
+    fail invalid_transition_exception("trip") unless can_transition_to?(:trip, :open, current_state)
+    @state = :open
+  end
+  alias trip! trip
+
+  #
+  # Transitions from an open state to a half_open state.
+  #
+  def attempt_reset
+    fail invalid_transition_exception("attempt_reset") unless can_transition_to?(:attempt_reset, :half_open, current_state)
+    @state = :half_open
+  end
+
+  #
+  # Close the circuit from an open or half open state.
+  #
+  def reset
+    fail invalid_transition_exception("reset") unless can_transition_to?(:reset, :closed, current_state)
+    @state = :closed
+    reset_failure_count
+  end
+
   private
 
   attr_reader :state
 
-  def can_transition_to?(to_state)
-    TRANSITIONS[to_state].include?(state)
+  def can_transition_to?(transition, to_state, from_state)
+    TRANSITIONS.fetch(transition).fetch(to_state).include?(from_state)
   end
 
   def invalid_transition_exception(event_name)
